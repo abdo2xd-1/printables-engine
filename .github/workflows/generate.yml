@@ -1,8 +1,11 @@
-- name: Run Generator Script
-        env:
-          GUMROAD_ACCESS_TOKEN: ${{ secrets.GUMROAD_ACCESS_TOKEN }}
-        run: |
-          python generate.py
+name: Generate Printables Engine
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
@@ -20,6 +23,8 @@
           pip install -r requirements.txt
 
       - name: Run Generator Script
+        env:
+          GUMROAD_ACCESS_TOKEN: ${{ secrets.GUMROAD_ACCESS_TOKEN }}
         run: |
           python generate.py
 
