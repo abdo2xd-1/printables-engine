@@ -1,5 +1,6 @@
 import os
 import zipfile
+import requests
 from PIL import Image, ImageDraw, ImageFont
 
 RATIOS = {
@@ -13,6 +14,34 @@ RATIOS = {
 BG_COLOR = "#F4F1EA"
 TEXT_COLOR = "#1A1A1A"
 SUBTEXT_COLOR = "#666666"
+
+def publish_to_gumroad(title, zip_path, price_usd=3.99):
+    token = os.getenv("GUMROAD_ACCESS_TOKEN")
+    if not token:
+        print("[!] لم يتم العثور على GUMROAD_ACCESS_TOKEN")
+        return
+
+    desc = f"""High-resolution minimalist printable wall art: "{title}".
+
+Instant digital download (300 DPI) ready for printing across 5 standard frame ratios (2:3, 3:4, 4:5, ISO, 11:14)."""
+
+    url = "https://api.gumroad.com/v2/products"
+    data = {
+        "access_token": token,
+        "name": f"{title} Minimalist Poster - Digital Download",
+        "price": int(price_usd * 100),
+        "description": desc,
+        "tags": "wall art, printable, typography, poster"
+    }
+
+    try:
+        res = requests.post(url, data=data).json()
+        if res.get("success"):
+            print(f"[✓] تم نشر المنتج على المتجر بنجاح: {res['product']['short_url']}")
+        else:
+            print(f"[X] خطأ في إنشاء المنتج: {res.get('message')}")
+    except Exception as e:
+        print(f"[X] استثناء أثناء الاتصال: {e}")
 
 def build_single_pack(title_text, subtitle_text, output_dir="dist"):
     os.makedirs(output_dir, exist_ok=True)
@@ -60,11 +89,11 @@ def build_single_pack(title_text, subtitle_text, output_dir="dist"):
             zipf.write(f, f)
             os.remove(f)
 
-    print(f"[Done] Generated: {zip_path}")
+    print(f"[Done] حزمة الـ ZIP جاهزة: {zip_path}")
+    publish_to_gumroad(title_text, zip_path)
 
 def run():
     if not os.path.exists("quotes.txt"):
-        print("[!] quotes.txt not found")
         return
 
     with open("quotes.txt", "r", encoding="utf-8") as f:
