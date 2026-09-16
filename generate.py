@@ -26,16 +26,21 @@ def publish_to_gumroad(title, zip_path, price_usd=3.99):
 Instant digital download (300 DPI) ready for printing across 5 standard frame ratios (2:3, 3:4, 4:5, ISO, 11:14)."""
 
     url = "https://api.gumroad.com/v2/products"
-    data = {
-        "access_token": token,
-        "name": f"{title} Minimalist Poster - Digital Download",
-        "price": int(price_usd * 100),
-        "description": desc,
-        "tags": "wall art, printable, typography, poster"
-    }
+    
+    payload = [
+        ("access_token", token),
+        ("name", f"{title} Minimalist Poster - Digital Download"),
+        ("price", str(int(price_usd * 100))),
+        ("description", desc),
+        ("tags[]", "wall art"),
+        ("tags[]", "printable"),
+        ("tags[]", "typography"),
+        ("tags[]", "poster")
+    ]
 
     try:
-        res = requests.post(url, data=data).json()
+        response = requests.post(url, data=payload)
+        res = response.json()
         if res.get("success"):
             print(f"[✓] تم نشر المنتج على المتجر بنجاح: {res['product']['short_url']}")
         else:
