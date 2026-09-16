@@ -1,11 +1,8 @@
-name: Generate Printables Engine
-
-on:
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
+- name: Run Generator Script
+        env:
+          GUMROAD_ACCESS_TOKEN: ${{ secrets.GUMROAD_ACCESS_TOKEN }}
+        run: |
+          python generate.py
 
     steps:
       - name: Checkout Code
