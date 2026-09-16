@@ -1,0 +1,34 @@
+name: Generate Printables Engine
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install System Fonts & Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-dejavu-core
+          pip install -r requirements.txt
+
+      - name: Run Generator Script
+        run: |
+          python generate.py
+
+      - name: Upload Output Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: printable-packs
+          path: dist/*.zip
+          retention-days: 7
